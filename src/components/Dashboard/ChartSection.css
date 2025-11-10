@@ -1,4 +1,4 @@
-.line-chart-section {
+.chart-section {
   background: transparent;
   padding: 0;
   width: 100%;
@@ -6,7 +6,7 @@
   overflow-x: auto;
 }
 
-.chart-container {
+.chart-section .chart-container {
   width: 100%;
   height: 400px;
   max-width: 100%;
@@ -14,27 +14,27 @@
 }
 
 /* PDF Generation Mode - Force Desktop Layout */
-body.generating-pdf .chart-container {
-  width: 1300px !important;
-  min-width: 1300px !important;
+body.generating-pdf .chart-section .chart-container {
+  width: 1340px !important;
+  min-width: 1340px !important;
   height: 500px !important;
   min-height: 500px !important;
 }
 
-body.generating-pdf .line-chart-section {
-  width: 1300px !important;
-  min-width: 1300px !important;
+body.generating-pdf .chart-section {
+  width: 1340px !important;
+  min-width: 1340px !important;
 }
 
 @media (max-width: 768px) {
-  body:not(.generating-pdf) .chart-container {
+  body:not(.generating-pdf) .chart-section .chart-container {
     width: 100% !important;
     min-width: auto !important;
     height: 300px !important;
     min-height: 250px !important;
   }
   
-  body:not(.generating-pdf) .line-chart-section {
+  body:not(.generating-pdf) .chart-section {
     width: 100% !important;
     min-width: auto !important;
   }

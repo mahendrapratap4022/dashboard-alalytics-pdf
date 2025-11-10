@@ -85,3 +85,12 @@
   box-shadow: 0 6px 12px rgba(52, 152, 219, 0.4);
 }
 
+/* PDF Generation Mode - Force Desktop Layout */
+body.generating-pdf .filter-row {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+}
+
+body.generating-pdf .filter-actions {
+  justify-content: flex-end !important;
+}
+

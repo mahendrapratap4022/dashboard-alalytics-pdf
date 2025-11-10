@@ -61,3 +61,19 @@
   font-weight: 500;
 }
 
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 250px;
+    z-index: 1001;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar.closed {
+    transform: translateX(-100%);
+  }
+}
+

@@ -169,20 +169,33 @@
   color: #f44336;
 }
 
+/* PDF Generation Mode - Force Desktop Layout */
+body.generating-pdf .cards-container {
+  grid-template-columns: 1fr 1fr 0.5fr !important;
+}
+
+body.generating-pdf .medium-cards-wrapper {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .cards-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .medium-cards-wrapper {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
 @media (max-width: 768px) {
-  .medium-cards-wrapper {
-    grid-template-columns: 1fr;
+  body:not(.generating-pdf) .cards-container {
+    grid-template-columns: 1fr !important;
+  }
+  
+  body:not(.generating-pdf) .medium-cards-wrapper {
+    grid-template-columns: 1fr !important;
   }
 }
 

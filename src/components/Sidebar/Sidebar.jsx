@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './Sidebar.css'
 
-const Sidebar = ({ isOpen }) => {
+const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation()
 
   const menuItems = [
@@ -10,6 +10,13 @@ const Sidebar = ({ isOpen }) => {
     { path: '/reports', label: 'Reports', icon: '📈' },
     { path: '/settings', label: 'Settings', icon: '⚙️' },
   ]
+
+  const handleLinkClick = () => {
+    // Close sidebar on mobile after clicking a link
+    if (window.innerWidth <= 768 && onClose) {
+      onClose()
+    }
+  }
 
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
@@ -22,6 +29,7 @@ const Sidebar = ({ isOpen }) => {
             key={item.path}
             to={item.path}
             className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+            onClick={handleLinkClick}
           >
             <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>

@@ -1,6 +1,9 @@
 .horizontal-chart-section {
   background: transparent;
   padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .chart-header {
@@ -75,5 +78,72 @@
 .chart-wrapper {
   width: 100%;
   height: 400px;
+  max-width: 100%;
+  min-height: 300px;
+}
+
+/* PDF Generation Mode - Force Desktop Layout */
+body.generating-pdf .chart-wrapper {
+  width: 1300px !important;
+  min-width: 1300px !important;
+  height: 500px !important;
+  min-height: 500px !important;
+}
+
+body.generating-pdf .horizontal-chart-section {
+  width: 1300px !important;
+  min-width: 1300px !important;
+}
+
+body.generating-pdf .chart-controls {
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+body.generating-pdf .control-item {
+  width: auto !important;
+}
+
+body.generating-pdf .tabs {
+  flex-wrap: wrap !important;
+}
+
+@media (max-width: 768px) {
+  body:not(.generating-pdf) .chart-wrapper {
+    width: 100% !important;
+    min-width: auto !important;
+    height: 300px !important;
+    min-height: 250px !important;
+  }
+
+  body:not(.generating-pdf) .horizontal-chart-section {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+
+  .tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .tab {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+  }
+
+  body:not(.generating-pdf) .chart-controls {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
+  }
+
+  body:not(.generating-pdf) .control-item {
+    width: 100% !important;
+  }
+
+  body:not(.generating-pdf) .control-item select {
+    width: 100% !important;
+  }
 }
 
