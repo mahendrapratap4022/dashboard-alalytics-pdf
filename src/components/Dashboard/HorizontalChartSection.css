@@ -77,35 +77,59 @@
 
 .chart-wrapper {
   width: 100%;
-  height: 400px;
+  height: 600px;
   max-width: 100%;
-  min-height: 300px;
+  min-height: 500px;
 }
 
 /* PDF Generation Mode - Force Desktop Layout */
+.horizontal-chart-section.pdf-mode {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-bottom: 40px;
+  page-break-inside: avoid;
+  padding: 20px 0;
+}
+
+.horizontal-chart-section.pdf-mode .chart-wrapper {
+  width: 1340px !important;
+  min-width: 1340px !important;
+  height: 500px !important;
+  min-height: 500px !important;
+}
+
+.horizontal-chart-section.pdf-mode.stock-location-section .chart-wrapper {
+  width: 1340px !important;
+  min-width: 1340px !important;
+  height: 800px !important;
+  min-height: 800px !important;
+}
+
+.pdf-chart-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #3498db;
+}
+
+body.generating-pdf .horizontal-chart-section .chart-header,
+body.generating-pdf .horizontal-chart-section .chart-controls,
+body.generating-pdf .horizontal-chart-section .tabs {
+  display: none !important;
+}
+
 body.generating-pdf .chart-wrapper {
-  width: 1300px !important;
-  min-width: 1300px !important;
+  width: 1340px !important;
+  min-width: 1340px !important;
   height: 500px !important;
   min-height: 500px !important;
 }
 
 body.generating-pdf .horizontal-chart-section {
-  width: 1300px !important;
-  min-width: 1300px !important;
-}
-
-body.generating-pdf .chart-controls {
-  flex-direction: row !important;
-  align-items: center !important;
-}
-
-body.generating-pdf .control-item {
-  width: auto !important;
-}
-
-body.generating-pdf .tabs {
-  flex-wrap: wrap !important;
+  width: 1340px !important;
+  min-width: 1340px !important;
 }
 
 @media (max-width: 768px) {

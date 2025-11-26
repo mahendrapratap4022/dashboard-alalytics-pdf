@@ -4,8 +4,6 @@ import './DataCards.css'
 const DataCards = () => {
   return (
     <div className="data-cards-section">
-      <h2 className="section-title">Key Metrics</h2>
-      
       <div className="cards-container">
         {/* Large Revenue Card - Col 6 */}
         <div className="card large-card revenue-card">
