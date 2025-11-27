@@ -4,17 +4,19 @@ import './FilterSection.css'
 const FilterSection = () => {
   const [filters, setFilters] = useState({
     dateOfService: '3months',
-    stockLocation: 'All',
-    provider: 'All',
-    hcpcs: 'All',
-    fitter: 'All',
-    visitStatus: 'All',
+    stockLocation: [],
+    provider: [],
+    hcpcs: [],
+    fitter: [],
+    visitStatus: [],
     fromDate: '',
     toDate: '',
-    itemCategory: 'All',
-    bilType: 'All',
-    itemNumber: 'All',
+    itemCategory: [],
+    bilType: [],
+    itemNumber: [],
   })
+
+  const [openDropdown, setOpenDropdown] = useState(null)
 
   const [isPdfMode, setIsPdfMode] = useState(false)
 
@@ -31,6 +33,17 @@ const FilterSection = () => {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.multi-select-wrapper')) {
+        setOpenDropdown(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   // Define all available options for each filter
   const filterOptions = {
     dateOfService: ['1 Month', '2 Months', '3 Months', 'Custom Date Range'],
@@ -41,7 +54,7 @@ const FilterSection = () => {
     visitStatus: ['Scheduled', 'Completed', 'In Progress', 'Cancelled', 'Pending', 'Rescheduled'],
     itemCategory: ['Wheelchairs', 'Walkers', 'Hospital Beds', 'Oxygen Equipment', 'Mobility Aids', 'Respiratory'],
     bilType: ['Insurance', 'Medicare', 'Medicaid', 'Private Pay', 'Workers Comp'],
-    itemNumber: ['ITM-001', 'ITM-002', 'ITM-003', 'ITM-004', 'ITM-005', 'ITM-006']
+    itemNumber: Array.from({ length: 200 }, (_, i) => `ITM-${String(i + 1).padStart(4, '0')}`)
   }
 
   const getFilterDisplayValue = (key, value) => {
@@ -51,10 +64,55 @@ const FilterSection = () => {
       if (value === '3months') return '3 Months'
       if (value === 'custom') return 'Custom Date Range'
     }
-    if (value === 'All' && filterOptions[key]) {
-      return filterOptions[key].join(', ')
+    if (Array.isArray(value)) {
+      // If nothing selected, show "None Selected"
+      if (value.length === 0) {
+        return 'None Selected'
+      }
+      // Always show the actual selected values, even if all are selected
+      return value.join(', ')
     }
     return value || 'Not Set'
+  }
+
+  const handleMultiSelectChange = (field, option) => {
+    const currentValues = filters[field]
+    let newValues
+    
+    if (currentValues.includes(option)) {
+      newValues = currentValues.filter(item => item !== option)
+    } else {
+      newValues = [...currentValues, option]
+    }
+    
+    setFilters({ ...filters, [field]: newValues })
+  }
+
+  const handleSelectAll = (field) => {
+    const allOptions = filterOptions[field]
+    const currentValues = filters[field]
+    
+    // If all are selected, deselect all. Otherwise, select all.
+    if (currentValues.length === allOptions.length) {
+      setFilters({ ...filters, [field]: [] })
+    } else {
+      setFilters({ ...filters, [field]: [...allOptions] })
+    }
+  }
+
+  const isAllSelected = (field) => {
+    const allOptions = filterOptions[field]
+    const currentValues = filters[field]
+    return currentValues.length === allOptions.length
+  }
+
+  const getDisplayText = (field) => {
+    const selected = filters[field]
+    const allOptions = filterOptions[field]
+    if (selected.length === 0) return 'Select...'
+    if (selected.length === allOptions.length) return 'All'
+    if (selected.length === 1) return selected[0]
+    return `${selected.length} selected`
   }
 
   const handleFilterChange = (field, value) => {
@@ -67,17 +125,18 @@ const FilterSection = () => {
   const handleReset = () => {
     setFilters({
       dateOfService: '3months',
-      stockLocation: 'All',
-      provider: 'All',
-      hcpcs: 'All',
-      fitter: 'All',
-      visitStatus: 'All',
+      stockLocation: [],
+      provider: [],
+      hcpcs: [],
+      fitter: [],
+      visitStatus: [],
       fromDate: '',
       toDate: '',
-      itemCategory: 'All',
-      bilType: 'All',
-      itemNumber: 'All',
+      itemCategory: [],
+      bilType: [],
+      itemNumber: [],
     })
+    setOpenDropdown(null)
   }
 
   const handleApply = () => {
@@ -199,117 +258,260 @@ const FilterSection = () => {
         <div className="filter-column">
           <div className="filter-item">
             <label>Stock Location</label>
-            <select
-              value={filters.stockLocation}
-              onChange={(e) => handleFilterChange('stockLocation', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="Warehouse A">Warehouse A</option>
-              <option value="Warehouse B">Warehouse B</option>
-              <option value="Warehouse C">Warehouse C</option>
-              <option value="Main Storage">Main Storage</option>
-              <option value="Regional Hub">Regional Hub</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'stockLocation' ? null : 'stockLocation')}
+              >
+                {getDisplayText('stockLocation')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'stockLocation' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('stockLocation')}
+                      onChange={() => handleSelectAll('stockLocation')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.stockLocation.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.stockLocation.includes(option)}
+                        onChange={() => handleMultiSelectChange('stockLocation', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="filter-item">
             <label>Item Category Name</label>
-            <select
-              value={filters.itemCategory}
-              onChange={(e) => handleFilterChange('itemCategory', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="Wheelchairs">Wheelchairs</option>
-              <option value="Walkers">Walkers</option>
-              <option value="Hospital Beds">Hospital Beds</option>
-              <option value="Oxygen Equipment">Oxygen Equipment</option>
-              <option value="Mobility Aids">Mobility Aids</option>
-              <option value="Respiratory">Respiratory</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'itemCategory' ? null : 'itemCategory')}
+              >
+                {getDisplayText('itemCategory')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'itemCategory' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('itemCategory')}
+                      onChange={() => handleSelectAll('itemCategory')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.itemCategory.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.itemCategory.includes(option)}
+                        onChange={() => handleMultiSelectChange('itemCategory', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="filter-column">
           <div className="filter-item">
             <label>Provider</label>
-            <select
-              value={filters.provider}
-              onChange={(e) => handleFilterChange('provider', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="Dr. Smith">Dr. Smith</option>
-              <option value="Dr. Johnson">Dr. Johnson</option>
-              <option value="Dr. Williams">Dr. Williams</option>
-              <option value="Dr. Brown">Dr. Brown</option>
-              <option value="Dr. Davis">Dr. Davis</option>
-              <option value="Dr. Martinez">Dr. Martinez</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'provider' ? null : 'provider')}
+              >
+                {getDisplayText('provider')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'provider' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('provider')}
+                      onChange={() => handleSelectAll('provider')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.provider.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.provider.includes(option)}
+                        onChange={() => handleMultiSelectChange('provider', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="filter-item">
             <label>Bil Type</label>
-            <select
-              value={filters.bilType}
-              onChange={(e) => handleFilterChange('bilType', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="Insurance">Insurance</option>
-              <option value="Medicare">Medicare</option>
-              <option value="Medicaid">Medicaid</option>
-              <option value="Private Pay">Private Pay</option>
-              <option value="Workers Comp">Workers Comp</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'bilType' ? null : 'bilType')}
+              >
+                {getDisplayText('bilType')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'bilType' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('bilType')}
+                      onChange={() => handleSelectAll('bilType')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.bilType.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.bilType.includes(option)}
+                        onChange={() => handleMultiSelectChange('bilType', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="filter-column">
           <div className="filter-item">
             <label>HCPCS</label>
-            <select
-              value={filters.hcpcs}
-              onChange={(e) => handleFilterChange('hcpcs', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="E0143">E0143 - Walker</option>
-              <option value="E1390">E1390 - Oxygen Concentrator</option>
-              <option value="E0260">E0260 - Hospital Bed</option>
-              <option value="K0001">K0001 - Standard Wheelchair</option>
-              <option value="E0601">E0601 - CPAP Device</option>
-              <option value="E0235">E0235 - Bed Rails</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'hcpcs' ? null : 'hcpcs')}
+              >
+                {getDisplayText('hcpcs')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'hcpcs' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('hcpcs')}
+                      onChange={() => handleSelectAll('hcpcs')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.hcpcs.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.hcpcs.includes(option)}
+                        onChange={() => handleMultiSelectChange('hcpcs', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="filter-item">
             <label>Item Number</label>
-            <select
-              value={filters.itemNumber}
-              onChange={(e) => handleFilterChange('itemNumber', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="ITM-001">ITM-001</option>
-              <option value="ITM-002">ITM-002</option>
-              <option value="ITM-003">ITM-003</option>
-              <option value="ITM-004">ITM-004</option>
-              <option value="ITM-005">ITM-005</option>
-              <option value="ITM-006">ITM-006</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'itemNumber' ? null : 'itemNumber')}
+              >
+                {getDisplayText('itemNumber')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'itemNumber' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('itemNumber')}
+                      onChange={() => handleSelectAll('itemNumber')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.itemNumber.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.itemNumber.includes(option)}
+                        onChange={() => handleMultiSelectChange('itemNumber', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="filter-column">
           <div className="filter-item">
             <label>Fitter</label>
-            <select
-              value={filters.fitter}
-              onChange={(e) => handleFilterChange('fitter', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="John Anderson">John Anderson</option>
-              <option value="Sarah Mitchell">Sarah Mitchell</option>
-              <option value="Mike Thompson">Mike Thompson</option>
-              <option value="Emily Rodriguez">Emily Rodriguez</option>
-              <option value="David Chen">David Chen</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'fitter' ? null : 'fitter')}
+              >
+                {getDisplayText('fitter')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'fitter' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('fitter')}
+                      onChange={() => handleSelectAll('fitter')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.fitter.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.fitter.includes(option)}
+                        onChange={() => handleMultiSelectChange('fitter', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <button className="reset-btn" onClick={handleReset}>
@@ -320,18 +522,38 @@ const FilterSection = () => {
         <div className="filter-column">
           <div className="filter-item">
             <label>Visit Status</label>
-            <select
-              value={filters.visitStatus}
-              onChange={(e) => handleFilterChange('visitStatus', e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="Scheduled">Scheduled</option>
-              <option value="Completed">Completed</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="Pending">Pending</option>
-              <option value="Rescheduled">Rescheduled</option>
-            </select>
+            <div className="multi-select-wrapper">
+              <div 
+                className="multi-select-display"
+                onClick={() => setOpenDropdown(openDropdown === 'visitStatus' ? null : 'visitStatus')}
+              >
+                {getDisplayText('visitStatus')}
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {openDropdown === 'visitStatus' && (
+                <div className="multi-select-dropdown">
+                  <label className="checkbox-option all-option">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected('visitStatus')}
+                      onChange={() => handleSelectAll('visitStatus')}
+                    />
+                    <span><strong>All</strong></span>
+                  </label>
+                  <div className="dropdown-divider"></div>
+                  {filterOptions.visitStatus.map(option => (
+                    <label key={option} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.visitStatus.includes(option)}
+                        onChange={() => handleMultiSelectChange('visitStatus', option)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <button className="apply-btn" onClick={handleApply}>

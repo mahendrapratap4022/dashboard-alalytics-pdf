@@ -4,9 +4,6 @@ import DataCards from '../components/Dashboard/DataCards'
 import LineChartSection from '../components/Dashboard/LineChartSection'
 import SecondLineChartSection from '../components/Dashboard/SecondLineChartSection'
 import HorizontalChartSection from '../components/Dashboard/HorizontalChartSection'
-import StackedBarChartSection from '../components/Dashboard/StackedBarChartSection'
-import PieChartSection from '../components/Dashboard/PieChartSection'
-import AreaChartSection from '../components/Dashboard/AreaChartSection'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import './Dashboard.css'
@@ -14,7 +11,7 @@ import './Dashboard.css'
 const Dashboard = () => {
   const [lastUpdated] = useState(new Date().toLocaleString())
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-  const [loggedUser] = useState('John Doe') // Replace with actual logged user
+  const [loggedUser] = useState('Tenant User') // Replace with actual logged user
   const printableRef = useRef(null)
 
   // Cleanup on component unmount
@@ -121,10 +118,7 @@ const Dashboard = () => {
         { element: element.querySelector('.stock-location-section'), name: 'Stock Location Chart' },
         { element: element.querySelector('.provider-section'), name: 'Provider Chart' },
         { element: element.querySelector('.hcpcs-section'), name: 'HCPCS Chart' },
-        { element: element.querySelector('.fitters-section'), name: 'Fitters Chart' },
-        { element: element.querySelector('.stacked-bar-chart-section'), name: 'Stacked Bar Chart' },
-        { element: element.querySelector('.pie-chart-section'), name: 'Pie Chart' },
-        { element: element.querySelector('.area-chart-section'), name: 'Area Chart' }
+        { element: element.querySelector('.fitters-section'), name: 'Fitters Chart' }
       ].filter(section => section.element) // Only include sections that exist
 
       let currentY = margin
@@ -141,6 +135,8 @@ const Dashboard = () => {
           allowTaint: true,
           backgroundColor: '#ffffff',
           windowWidth: 1400,
+          windowHeight: section.element.scrollHeight,
+          height: section.element.scrollHeight,
           onclone: (clonedDoc) => {
             // Fix color issues in clone
             const allElements = clonedDoc.querySelectorAll('*')
@@ -165,6 +161,8 @@ const Dashboard = () => {
         const sectionImgWidth = contentWidth
         const sectionImgHeight = (sectionCanvas.height * contentWidth) / sectionCanvas.width
         
+        console.log(`${section.name} height: ${sectionImgHeight}mm`)
+        
         // Check if section fits on current page
         if (!isFirstSection && (currentY + sectionImgHeight) > (pdfHeight - margin)) {
           // Section doesn't fit, start a new page
@@ -173,14 +171,32 @@ const Dashboard = () => {
           console.log(`${section.name} moved to new page`)
         }
 
-        // Add section image to PDF
-        const sectionImgData = sectionCanvas.toDataURL('image/png', 1.0)
-        pdf.addImage(sectionImgData, 'PNG', margin, currentY, sectionImgWidth, sectionImgHeight, undefined, 'FAST')
+        // Check if section is too tall for even a single page
+        if (sectionImgHeight > (pdfHeight - margin * 2)) {
+          console.warn(`${section.name} is ${sectionImgHeight}mm tall, which exceeds page height. It will be scaled down.`)
+          // For very tall sections, scale down to fit on one page
+          const scaledHeight = pdfHeight - margin * 2 - 10
+          pdf.addImage(
+            sectionCanvas.toDataURL('image/png', 1.0), 
+            'PNG', 
+            margin, 
+            currentY, 
+            sectionImgWidth, 
+            scaledHeight, 
+            undefined, 
+            'FAST'
+          )
+          currentY = margin + scaledHeight + 5
+        } else {
+          // Add section image to PDF at normal size
+          const sectionImgData = sectionCanvas.toDataURL('image/png', 1.0)
+          pdf.addImage(sectionImgData, 'PNG', margin, currentY, sectionImgWidth, sectionImgHeight, undefined, 'FAST')
+          
+          // Update position for next section
+          currentY += sectionImgHeight + 5 // 5mm gap between sections
+        }
         
-        // Update position for next section
-        currentY += sectionImgHeight + 5 // 5mm gap between sections
         isFirstSection = false
-        
         console.log(`${section.name} added, new Y position: ${currentY}`)
       }
 
@@ -258,9 +274,6 @@ const Dashboard = () => {
         <LineChartSection />
         <SecondLineChartSection />
         <HorizontalChartSection />
-        <StackedBarChartSection />
-        <PieChartSection />
-        <AreaChartSection />
       </div>
     </div>
   )
