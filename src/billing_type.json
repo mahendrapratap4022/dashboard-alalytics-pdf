@@ -1,0 +1,9 @@
+{
+  "billing_type": [
+    "Rental",
+    "Insurance",
+    "Cash Pay",
+    "Warranty",
+    "Workers Comp"
+  ]
+}
