@@ -1,19 +1,68 @@
 import React, { useState, useEffect } from 'react'
 import './FilterSection.css'
+import providersData from '../../data/providers.json'
+import hcpcsData from '../../data/hcpcs_codes.json'
+import itemCategoryData from '../../data/item_category.json'
+import locationsData from '../../data/locations.json'
+import billingTypeData from '../../data/billing_type.json'
 
-const FilterSection = () => {
+const FilterSection = ({ onFiltersChange }) => {
+  // Define all available options for each filter
+  const filterOptions = {
+    dateOfService: [
+      'Last Day',
+      'Last Week',
+      'Last 15 Days',
+      'Last 1 Month',
+      'Three Months',
+      'Six Months',
+      'Eight Months',
+      'Twelve Months',
+      'Last Calendar Month',
+      'This Calendar Month',
+      'Last 6 Calendar Months',
+      'Last Calendar Week (Mon-Sun)',
+      'This Calendar Week (Mon-Sun)',
+      'Last Calendar Quarter',
+      'This Calendar Quarter',
+      'This Calendar Year',
+      'Last Calendar Year'
+    ],
+    stockLocation: locationsData.locations,
+    provider: providersData.providers.map(p => p.Name),
+    hcpcs: hcpcsData.hcpcs_codes,
+    fitter: providersData.providers.map(p => p.Name).slice(0, 15),
+    visitStatus: ['Scheduled', 'Completed', 'In Progress', 'Cancelled', 'Pending', 'Rescheduled'],
+    itemCategory: itemCategoryData.item_category,
+    bilType: billingTypeData.billing_type,
+    itemNumber: Array.from({ length: 200 }, (_, i) => `ITM-${String(i + 1).padStart(4, '0')}`)
+  }
+
+  // Calculate initial date range for 3 months
+  const getInitialDates = () => {
+    const today = new Date()
+    const threeMonthsAgo = new Date(today)
+    threeMonthsAgo.setMonth(today.getMonth() - 3)
+    return {
+      fromDate: threeMonthsAgo.toISOString().split('T')[0],
+      toDate: today.toISOString().split('T')[0]
+    }
+  }
+
+  const initialDates = getInitialDates()
+
   const [filters, setFilters] = useState({
-    dateOfService: '3months',
-    stockLocation: [],
-    provider: [],
-    hcpcs: [],
-    fitter: [],
-    visitStatus: [],
-    fromDate: '',
-    toDate: '',
-    itemCategory: [],
-    bilType: [],
-    itemNumber: [],
+    dateOfService: 'Three Months',
+    stockLocation: [...filterOptions.stockLocation],
+    provider: [...filterOptions.provider],
+    hcpcs: [...filterOptions.hcpcs],
+    fitter: [...filterOptions.fitter],
+    visitStatus: [...filterOptions.visitStatus],
+    fromDate: initialDates.fromDate,
+    toDate: initialDates.toDate,
+    itemCategory: [...filterOptions.itemCategory],
+    bilType: [...filterOptions.bilType],
+    itemNumber: [...filterOptions.itemNumber],
   })
 
   const [openDropdown, setOpenDropdown] = useState(null)
@@ -44,26 +93,13 @@ const FilterSection = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Define all available options for each filter
-  const filterOptions = {
-    dateOfService: ['1 Month', '2 Months', '3 Months', 'Custom Date Range'],
-    stockLocation: ['Warehouse A', 'Warehouse B', 'Warehouse C', 'Main Storage', 'Regional Hub'],
-    provider: ['Dr. Smith', 'Dr. Johnson', 'Dr. Williams', 'Dr. Brown', 'Dr. Davis', 'Dr. Martinez'],
-    hcpcs: ['E0143 - Walker', 'E1390 - Oxygen Concentrator', 'E0260 - Hospital Bed', 'K0001 - Standard Wheelchair', 'E0601 - CPAP Device', 'E0235 - Bed Rails'],
-    fitter: ['John Anderson', 'Sarah Mitchell', 'Mike Thompson', 'Emily Rodriguez', 'David Chen'],
-    visitStatus: ['Scheduled', 'Completed', 'In Progress', 'Cancelled', 'Pending', 'Rescheduled'],
-    itemCategory: ['Wheelchairs', 'Walkers', 'Hospital Beds', 'Oxygen Equipment', 'Mobility Aids', 'Respiratory'],
-    bilType: ['Insurance', 'Medicare', 'Medicaid', 'Private Pay', 'Workers Comp'],
-    itemNumber: Array.from({ length: 200 }, (_, i) => `ITM-${String(i + 1).padStart(4, '0')}`)
-  }
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange(filters)
+    }
+  }, [filters, onFiltersChange])
 
   const getFilterDisplayValue = (key, value) => {
-    if (key === 'dateOfService') {
-      if (value === '1month') return '1 Month'
-      if (value === '2months') return '2 Months'
-      if (value === '3months') return '3 Months'
-      if (value === 'custom') return 'Custom Date Range'
-    }
     if (Array.isArray(value)) {
       // If nothing selected, show "None Selected"
       if (value.length === 0) {
@@ -73,6 +109,14 @@ const FilterSection = () => {
       return value.join(', ')
     }
     return value || 'Not Set'
+  }
+
+  // Helper function to determine if filter should be full width
+  const shouldBeFullWidth = (filterValue) => {
+    if (Array.isArray(filterValue)) {
+      return filterValue.length > 30
+    }
+    return false
   }
 
   const handleMultiSelectChange = (field, option) => {
@@ -116,25 +160,164 @@ const FilterSection = () => {
   }
 
   const handleFilterChange = (field, value) => {
-    setFilters({ ...filters, [field]: value })
+    if (field === 'dateOfService') {
+      // Calculate date range based on selection
+      const today = new Date()
+      let fromDate = ''
+      let toDate = today.toISOString().split('T')[0]
+      
+      switch (value) {
+        case 'Last Day':
+          const yesterday = new Date(today)
+          yesterday.setDate(today.getDate() - 1)
+          fromDate = yesterday.toISOString().split('T')[0]
+          toDate = yesterday.toISOString().split('T')[0]
+          break
+          
+        case 'Last Week':
+          const lastWeek = new Date(today)
+          lastWeek.setDate(today.getDate() - 7)
+          fromDate = lastWeek.toISOString().split('T')[0]
+          break
+          
+        case 'Last 15 Days':
+          const last15Days = new Date(today)
+          last15Days.setDate(today.getDate() - 15)
+          fromDate = last15Days.toISOString().split('T')[0]
+          break
+          
+        case 'Last 1 Month':
+          const lastMonth = new Date(today)
+          lastMonth.setMonth(today.getMonth() - 1)
+          fromDate = lastMonth.toISOString().split('T')[0]
+          break
+          
+        case 'Three Months':
+          const threeMonths = new Date(today)
+          threeMonths.setMonth(today.getMonth() - 3)
+          fromDate = threeMonths.toISOString().split('T')[0]
+          break
+          
+        case 'Six Months':
+          const sixMonths = new Date(today)
+          sixMonths.setMonth(today.getMonth() - 6)
+          fromDate = sixMonths.toISOString().split('T')[0]
+          break
+          
+        case 'Eight Months':
+          const eightMonths = new Date(today)
+          eightMonths.setMonth(today.getMonth() - 8)
+          fromDate = eightMonths.toISOString().split('T')[0]
+          break
+          
+        case 'Twelve Months':
+          const twelveMonths = new Date(today)
+          twelveMonths.setMonth(today.getMonth() - 12)
+          fromDate = twelveMonths.toISOString().split('T')[0]
+          break
+          
+        case 'Last Calendar Month':
+          const lastCalMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+          const lastCalMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0)
+          fromDate = lastCalMonth.toISOString().split('T')[0]
+          toDate = lastCalMonthEnd.toISOString().split('T')[0]
+          break
+          
+        case 'This Calendar Month':
+          const thisCalMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+          fromDate = thisCalMonthStart.toISOString().split('T')[0]
+          toDate = today.toISOString().split('T')[0]
+          break
+          
+        case 'Last 6 Calendar Months':
+          const last6CalMonths = new Date(today.getFullYear(), today.getMonth() - 6, 1)
+          fromDate = last6CalMonths.toISOString().split('T')[0]
+          break
+          
+        case 'Last Calendar Week (Mon-Sun)':
+          const lastWeekEnd = new Date(today)
+          const dayOfWeek = today.getDay()
+          const daysToLastSunday = dayOfWeek === 0 ? 7 : dayOfWeek
+          lastWeekEnd.setDate(today.getDate() - daysToLastSunday)
+          const lastWeekStart = new Date(lastWeekEnd)
+          lastWeekStart.setDate(lastWeekEnd.getDate() - 6)
+          fromDate = lastWeekStart.toISOString().split('T')[0]
+          toDate = lastWeekEnd.toISOString().split('T')[0]
+          break
+          
+        case 'This Calendar Week (Mon-Sun)':
+          const thisWeekStart = new Date(today)
+          const currentDayOfWeek = today.getDay()
+          const daysFromMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1
+          thisWeekStart.setDate(today.getDate() - daysFromMonday)
+          fromDate = thisWeekStart.toISOString().split('T')[0]
+          toDate = today.toISOString().split('T')[0]
+          break
+          
+        case 'Last Calendar Quarter':
+          const currentQuarter = Math.floor(today.getMonth() / 3)
+          const lastQuarterStart = new Date(today.getFullYear(), (currentQuarter - 1) * 3, 1)
+          const lastQuarterEnd = new Date(today.getFullYear(), currentQuarter * 3, 0)
+          
+          // Handle when we're in Q1 (need to go back to previous year Q4)
+          if (currentQuarter === 0) {
+            lastQuarterStart.setFullYear(today.getFullYear() - 1)
+            lastQuarterStart.setMonth(9) // October (Q4 starts in month 9)
+            lastQuarterEnd.setFullYear(today.getFullYear() - 1)
+            lastQuarterEnd.setMonth(11)
+            lastQuarterEnd.setDate(31) // December 31
+          }
+          
+          fromDate = lastQuarterStart.toISOString().split('T')[0]
+          toDate = lastQuarterEnd.toISOString().split('T')[0]
+          break
+          
+        case 'This Calendar Quarter':
+          const thisQuarter = Math.floor(today.getMonth() / 3)
+          const thisQuarterStart = new Date(today.getFullYear(), thisQuarter * 3, 1)
+          fromDate = thisQuarterStart.toISOString().split('T')[0]
+          toDate = today.toISOString().split('T')[0]
+          break
+          
+        case 'This Calendar Year':
+          const thisYearStart = new Date(today.getFullYear(), 0, 1)
+          fromDate = thisYearStart.toISOString().split('T')[0]
+          toDate = today.toISOString().split('T')[0]
+          break
+          
+        case 'Last Calendar Year':
+          const lastYearStart = new Date(today.getFullYear() - 1, 0, 1)
+          const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31)
+          fromDate = lastYearStart.toISOString().split('T')[0]
+          toDate = lastYearEnd.toISOString().split('T')[0]
+          break
+          
+        default:
+          // Keep existing dates if unknown option
+          fromDate = filters.fromDate
+          toDate = filters.toDate
+      }
+      
+      setFilters({ ...filters, [field]: value, fromDate, toDate })
+    } else {
+      setFilters({ ...filters, [field]: value })
+    }
   }
 
-  // Check if custom date range is selected
-  const isCustomDateRange = filters.dateOfService === 'custom'
-
   const handleReset = () => {
+    const resetDates = getInitialDates()
     setFilters({
-      dateOfService: '3months',
-      stockLocation: [],
-      provider: [],
-      hcpcs: [],
-      fitter: [],
-      visitStatus: [],
-      fromDate: '',
-      toDate: '',
-      itemCategory: [],
-      bilType: [],
-      itemNumber: [],
+      dateOfService: 'Three Months',
+      stockLocation: [...filterOptions.stockLocation],
+      provider: [...filterOptions.provider],
+      hcpcs: [...filterOptions.hcpcs],
+      fitter: [...filterOptions.fitter],
+      visitStatus: [...filterOptions.visitStatus],
+      fromDate: resetDates.fromDate,
+      toDate: resetDates.toDate,
+      itemCategory: [...filterOptions.itemCategory],
+      bilType: [...filterOptions.bilType],
+      itemNumber: [...filterOptions.itemNumber],
     })
     setOpenDropdown(null)
   }
@@ -150,63 +333,129 @@ const FilterSection = () => {
       <div className="filter-section pdf-filter-summary">
         <h3 className="pdf-summary-title">Applied Filters</h3>
         <div className="pdf-summary-grid">
+          {/* 6-column filters (top) - filters with ≤30 items */}
           <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Date of Service:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('dateOfService', filters.dateOfService)}</span>
+            <span className="pdf-summary-label">From Date:</span>
+            <span className="pdf-summary-value">{filters.fromDate || 'Not Set'}</span>
           </div>
 
-          {filters.dateOfService === 'custom' && (
-            <>
-              <div className="pdf-summary-item">
-                <span className="pdf-summary-label">From Date:</span>
-                <span className="pdf-summary-value">{filters.fromDate || 'Not Set'}</span>
-              </div>
-              <div className="pdf-summary-item">
-                <span className="pdf-summary-label">To Date:</span>
-                <span className="pdf-summary-value">{filters.toDate || 'Not Set'}</span>
-              </div>
-            </>
+          <div className="pdf-summary-item">
+            <span className="pdf-summary-label">To Date:</span>
+            <span className="pdf-summary-value">{filters.toDate || 'Not Set'}</span>
+          </div>
+
+          {!shouldBeFullWidth(filters.stockLocation) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">Stock Location:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('stockLocation', filters.stockLocation)}</span>
+            </div>
           )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Stock Location:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('stockLocation', filters.stockLocation)}</span>
-          </div>
+          {!shouldBeFullWidth(filters.provider) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">Provider:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('provider', filters.provider)}</span>
+            </div>
+          )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Provider:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('provider', filters.provider)}</span>
-          </div>
+          {!shouldBeFullWidth(filters.hcpcs) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">HCPCS:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('hcpcs', filters.hcpcs)}</span>
+            </div>
+          )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">HCPCS:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('hcpcs', filters.hcpcs)}</span>
-          </div>
+          {!shouldBeFullWidth(filters.fitter) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">Fitter:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('fitter', filters.fitter)}</span>
+            </div>
+          )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Fitter:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('fitter', filters.fitter)}</span>
-          </div>
+          {!shouldBeFullWidth(filters.visitStatus) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">Visit Status:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('visitStatus', filters.visitStatus)}</span>
+            </div>
+          )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Visit Status:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('visitStatus', filters.visitStatus)}</span>
-          </div>
+          {!shouldBeFullWidth(filters.bilType) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">Bil Type:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('bilType', filters.bilType)}</span>
+            </div>
+          )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Item Category:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('itemCategory', filters.itemCategory)}</span>
-          </div>
+          {!shouldBeFullWidth(filters.itemCategory) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">Item Category:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('itemCategory', filters.itemCategory)}</span>
+            </div>
+          )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Bil Type:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('bilType', filters.bilType)}</span>
-          </div>
+          {!shouldBeFullWidth(filters.itemNumber) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">Item Number:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('itemNumber', filters.itemNumber)}</span>
+            </div>
+          )}
 
-          <div className="pdf-summary-item">
-            <span className="pdf-summary-label">Item Number:</span>
-            <span className="pdf-summary-value">{getFilterDisplayValue('itemNumber', filters.itemNumber)}</span>
-          </div>
+          {/* 12-column filters (bottom) - filters with >30 items */}
+          {shouldBeFullWidth(filters.stockLocation) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">Stock Location:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('stockLocation', filters.stockLocation)}</span>
+            </div>
+          )}
+
+          {shouldBeFullWidth(filters.provider) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">Provider:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('provider', filters.provider)}</span>
+            </div>
+          )}
+
+          {shouldBeFullWidth(filters.hcpcs) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">HCPCS:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('hcpcs', filters.hcpcs)}</span>
+            </div>
+          )}
+
+          {shouldBeFullWidth(filters.fitter) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">Fitter:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('fitter', filters.fitter)}</span>
+            </div>
+          )}
+
+          {shouldBeFullWidth(filters.visitStatus) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">Visit Status:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('visitStatus', filters.visitStatus)}</span>
+            </div>
+          )}
+
+          {shouldBeFullWidth(filters.bilType) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">Bil Type:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('bilType', filters.bilType)}</span>
+            </div>
+          )}
+
+          {shouldBeFullWidth(filters.itemCategory) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">Item Category:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('itemCategory', filters.itemCategory)}</span>
+            </div>
+          )}
+
+          {shouldBeFullWidth(filters.itemNumber) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">Item Number:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('itemNumber', filters.itemNumber)}</span>
+            </div>
+          )}
         </div>
       </div>
     )
@@ -224,10 +473,9 @@ const FilterSection = () => {
                 value={filters.dateOfService}
                 onChange={(e) => handleFilterChange('dateOfService', e.target.value)}
               >
-                <option value="1month">1 Month</option>
-                <option value="2months">2 Months</option>
-                <option value="3months">3 Months</option>
-                <option value="custom">Custom Date Range</option>
+                {filterOptions.dateOfService.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
               </select>
             </div>
 
@@ -238,7 +486,6 @@ const FilterSection = () => {
                   type="date"
                   value={filters.fromDate}
                   onChange={(e) => handleFilterChange('fromDate', e.target.value)}
-                  disabled={!isCustomDateRange}
                 />
               </div>
 
@@ -248,7 +495,6 @@ const FilterSection = () => {
                   type="date"
                   value={filters.toDate}
                   onChange={(e) => handleFilterChange('toDate', e.target.value)}
-                  disabled={!isCustomDateRange}
                 />
               </div>
             </div>

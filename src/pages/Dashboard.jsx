@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react'
 import FilterSection from '../components/Dashboard/FilterSection'
 import DataCards from '../components/Dashboard/DataCards'
 import LineChartSection from '../components/Dashboard/LineChartSection'
-import SecondLineChartSection from '../components/Dashboard/SecondLineChartSection'
 import HorizontalChartSection from '../components/Dashboard/HorizontalChartSection'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
@@ -12,6 +11,7 @@ const Dashboard = () => {
   const [lastUpdated] = useState(new Date().toLocaleString())
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   const [loggedUser] = useState('Tenant User') // Replace with actual logged user
+  const [filters, setFilters] = useState({})
   const printableRef = useRef(null)
 
   // Cleanup on component unmount
@@ -99,7 +99,7 @@ const Dashboard = () => {
       // A4 Landscape dimensions (in mm)
       const pdfWidth = 297
       const pdfHeight = 210
-      const margin = 10 // 10mm margin
+      const margin = 5 // Reduced to 5mm margin to maximize content space
       const contentWidth = pdfWidth - (margin * 2)
       const contentHeight = pdfHeight - (margin * 2)
       
@@ -173,20 +173,61 @@ const Dashboard = () => {
 
         // Check if section is too tall for even a single page
         if (sectionImgHeight > (pdfHeight - margin * 2)) {
-          console.warn(`${section.name} is ${sectionImgHeight}mm tall, which exceeds page height. It will be scaled down.`)
-          // For very tall sections, scale down to fit on one page
-          const scaledHeight = pdfHeight - margin * 2 - 10
-          pdf.addImage(
-            sectionCanvas.toDataURL('image/png', 1.0), 
-            'PNG', 
-            margin, 
-            currentY, 
-            sectionImgWidth, 
-            scaledHeight, 
-            undefined, 
-            'FAST'
-          )
-          currentY = margin + scaledHeight + 5
+          console.warn(`${section.name} is ${sectionImgHeight}mm tall, which exceeds page height. Splitting across multiple pages.`)
+          
+          // Split the section across multiple pages
+          const sectionImgData = sectionCanvas.toDataURL('image/png', 1.0)
+          const bottomSafetyMargin = 25 // Leave 25mm at bottom to prevent text cutting
+          let remainingHeight = sectionImgHeight
+          let sourceY = 0
+          
+          while (remainingHeight > 0) {
+            // Calculate available height on current page
+            const availableHeight = (pdfHeight - margin - bottomSafetyMargin) - currentY
+            const heightToAdd = Math.min(remainingHeight, availableHeight)
+            
+            // Calculate source dimensions for canvas slice
+            const sourceHeight = (heightToAdd / sectionImgHeight) * sectionCanvas.height
+            
+            // Create a temporary canvas to hold the slice
+            const tempCanvas = document.createElement('canvas')
+            tempCanvas.width = sectionCanvas.width
+            tempCanvas.height = sourceHeight
+            const tempCtx = tempCanvas.getContext('2d')
+            
+            // Draw the slice from the original canvas
+            tempCtx.drawImage(
+              sectionCanvas,
+              0, sourceY, // source x, y
+              sectionCanvas.width, sourceHeight, // source width, height
+              0, 0, // dest x, y
+              sectionCanvas.width, sourceHeight // dest width, height
+            )
+            
+            // Add the slice to PDF
+            pdf.addImage(
+              tempCanvas.toDataURL('image/png', 1.0),
+              'PNG',
+              margin,
+              currentY,
+              sectionImgWidth,
+              heightToAdd,
+              undefined,
+              'FAST'
+            )
+            
+            sourceY += sourceHeight
+            remainingHeight -= heightToAdd
+            
+            // If there's more content, add a new page
+            if (remainingHeight > 0) {
+              pdf.addPage()
+              currentY = margin
+              console.log(`${section.name} continued on new page, remaining: ${remainingHeight}mm`)
+            } else {
+              currentY += heightToAdd + 5
+            }
+          }
         } else {
           // Add section image to PDF at normal size
           const sectionImgData = sectionCanvas.toDataURL('image/png', 1.0)
@@ -267,12 +308,11 @@ const Dashboard = () => {
             </div>
           </div>
           
-          <FilterSection />
+          <FilterSection onFiltersChange={setFilters} />
         </div>
         
-        <DataCards />
+        <DataCards toDate={filters.toDate} />
         <LineChartSection />
-        <SecondLineChartSection />
         <HorizontalChartSection />
       </div>
     </div>

@@ -6,10 +6,13 @@
 /* PDF Filter Summary */
 .pdf-filter-summary {
   background: #f8f9fa;
-  padding: 20px;
+  padding: 15px 15px 25px 15px;
   border-radius: 8px;
   border: 2px solid #d1d5db;
   page-break-inside: auto;
+  min-height: fit-content;
+  height: auto;
+  max-height: none;
 }
 
 body.generating-pdf .pdf-filter-summary {
@@ -18,28 +21,32 @@ body.generating-pdf .pdf-filter-summary {
 }
 
 .pdf-summary-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: #2c3e50;
-  margin: 0 0 15px 0;
-  padding-bottom: 8px;
+  margin: 0 0 10px 0;
+  padding-bottom: 6px;
   border-bottom: 2px solid #3498db;
 }
 
 .pdf-summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  column-gap: 30px;
+  gap: 12px;
+  column-gap: 20px;
   align-items: start;
   grid-auto-rows: auto;
+  min-height: fit-content;
+  height: auto;
+  max-height: none;
+  padding-bottom: 25px;
 }
 
 .pdf-summary-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 10px;
+  gap: 3px;
+  padding: 8px 8px 12px 8px;
   background: white;
   border-radius: 6px;
   border-left: 4px solid #3498db;
@@ -47,6 +54,13 @@ body.generating-pdf .pdf-filter-summary {
   height: auto;
   overflow: visible;
   width: 100%;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  margin-bottom: 5px;
+}
+
+.pdf-summary-item-full {
+  grid-column: 1 / -1;
 }
 
 .pdf-summary-label {
@@ -61,13 +75,14 @@ body.generating-pdf .pdf-filter-summary {
   font-size: 10px;
   color: #2c3e50;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.5;
   word-wrap: break-word;
   white-space: normal;
   max-width: 100%;
   overflow-wrap: break-word;
   max-height: none;
   overflow: visible;
+  padding-bottom: 8px;
 }
 
 .section-title {

@@ -1,7 +1,14 @@
 import React from 'react'
 import './DataCards.css'
 
-const DataCards = () => {
+const DataCards = ({ toDate }) => {
+  // Format the date for display
+  const formattedDate = toDate ? new Date(toDate).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  }) : ''
+
   return (
     <div className="data-cards-section">
       <div className="cards-container">
@@ -29,42 +36,40 @@ const DataCards = () => {
         {/* Medium Cards Grid - Col 5 */}
         <div className="medium-cards-wrapper">
           <div className="medium-card yellow-card">
-            <span className="card-label">Total Units</span>
             <span className="card-value">1,245</span>
+            <span className="card-label">Dispensed Units</span>
           </div>
           <div className="medium-card yellow-card">
-            <span className="card-label">Total Charged</span>
             <span className="card-value">$145,890</span>
+            <span className="card-label">Purchased Units</span>
           </div>
           <div className="medium-card yellow-card">
-            <span className="card-label">Total Allowed</span>
             <span className="card-value">$125,450</span>
+            <span className="card-label">Quantity on Hand {formattedDate}</span>
           </div>
           <div className="medium-card yellow-card">
-            <span className="card-label">Avg Unit Price</span>
             <span className="card-value">$117.20</span>
+            <span className="card-label">Total Charges</span>
           </div>
           <div className="medium-card yellow-card">
-            <span className="card-label">Total Orders</span>
             <span className="card-value">342</span>
+            <span className="card-label">Total Purchases</span>
           </div>
           <div className="medium-card yellow-card">
-            <span className="card-label">Pending Orders</span>
             <span className="card-value">28</span>
+            <span className="card-label">Total Stock Value {formattedDate}</span>
           </div>
         </div>
 
         {/* Additional Metric Cards */}
         <div className="side-cards-wrapper">
           <div className="side-card purple-card">
-            <span className="card-label">Completion Rate</span>
             <span className="card-value">92%</span>
-            <span className="card-trend positive">↑ 5.2%</span>
+            <span className="card-label">Patient Refused</span>
           </div>
           <div className="side-card purple-card">
-            <span className="card-label">Avg Delivery Time</span>
             <span className="card-value">4.5 days</span>
-            <span className="card-trend positive">↓ 0.8 days</span>
+            <span className="card-label">Visit Discarded</span>
           </div>
         </div>
       </div>

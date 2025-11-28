@@ -4,8 +4,6 @@ import './HorizontalChartSection.css'
 
 const HorizontalChartSection = () => {
   const [activeTab, setActiveTab] = useState('stockLocation')
-  const [filterBy, setFilterBy] = useState('revenue')
-  const [selectedLocation, setSelectedLocation] = useState('All')
   const [isPdfMode, setIsPdfMode] = useState(false)
 
   useEffect(() => {
@@ -23,186 +21,174 @@ const HorizontalChartSection = () => {
     return () => observer.disconnect()
   }, [])
 
-  // Sample data for different tabs
-  const stockLocationData = {
-    revenue: [
-      { name: 'Location A', value: 28500 },
-      { name: 'Location B', value: 24200 },
-      { name: 'Location C', value: 19800 },
-      { name: 'Location D', value: 15600 },
-      { name: 'Location E', value: 12100 },
-      { name: 'Location F', value: 10800 },
-      { name: 'Location G', value: 9500 },
-      { name: 'Location H', value: 8200 },
-      { name: 'Location I', value: 7400 },
-      { name: 'Location J', value: 6800 },
-      { name: 'Location K', value: 5900 },
-      { name: 'Location L', value: 5100 },
-      { name: 'Location M', value: 4500 },
-      { name: 'Location N', value: 3800 },
-      { name: 'Location O', value: 3200 },
-    ],
-    quantity: [
-      { name: 'Location A', value: 385 },
-      { name: 'Location B', value: 342 },
-      { name: 'Location C', value: 298 },
-      { name: 'Location D', value: 256 },
-      { name: 'Location E', value: 189 },
-      { name: 'Location F', value: 165 },
-      { name: 'Location G', value: 148 },
-      { name: 'Location H', value: 132 },
-      { name: 'Location I', value: 119 },
-      { name: 'Location J', value: 105 },
-      { name: 'Location K', value: 92 },
-      { name: 'Location L', value: 81 },
-      { name: 'Location M', value: 73 },
-      { name: 'Location N', value: 64 },
-      { name: 'Location O', value: 55 },
-    ],
-  }
+  // Sample data for different tabs - combined Qty and Revenue
+  // Multiply qty by 50 to make it more visible on the same scale as revenue
+  const stockLocationData = [
+    { name: 'Location A', qty: 385 * 50, revenue: 28500, qtyActual: 385 },
+    { name: 'Location B', qty: 342 * 50, revenue: 24200, qtyActual: 342 },
+    { name: 'Location C', qty: 298 * 50, revenue: 19800, qtyActual: 298 },
+    { name: 'Location D', qty: 256 * 50, revenue: 15600, qtyActual: 256 },
+    { name: 'Location E', qty: 189 * 50, revenue: 12100, qtyActual: 189 },
+    { name: 'Location F', qty: 165 * 50, revenue: 10800, qtyActual: 165 },
+    { name: 'Location G', qty: 148 * 50, revenue: 9500, qtyActual: 148 },
+    { name: 'Location H', qty: 132 * 50, revenue: 8200, qtyActual: 132 },
+    { name: 'Location I', qty: 119 * 50, revenue: 7400, qtyActual: 119 },
+    { name: 'Location J', qty: 105 * 50, revenue: 6800, qtyActual: 105 },
+    { name: 'Location K', qty: 92 * 50, revenue: 5900, qtyActual: 92 },
+    { name: 'Location L', qty: 81 * 50, revenue: 5100, qtyActual: 81 },
+    { name: 'Location M', qty: 73 * 50, revenue: 4500, qtyActual: 73 },
+    { name: 'Location N', qty: 64 * 50, revenue: 3800, qtyActual: 64 },
+    { name: 'Location O', qty: 55 * 50, revenue: 3200, qtyActual: 55 },
+  ]
 
-  const providerData = {
-    revenue: [
-      { name: 'Provider A', value: 32400 },
-      { name: 'Provider B', value: 28900 },
-      { name: 'Provider C', value: 21500 },
-      { name: 'Provider D', value: 18700 },
-      { name: 'Provider E', value: 15200 },
-    ],
-    quantity: [
-      { name: 'Provider A', value: 425 },
-      { name: 'Provider B', value: 389 },
-      { name: 'Provider C', value: 312 },
-      { name: 'Provider D', value: 278 },
-      { name: 'Provider E', value: 234 },
-    ],
-  }
+  const providerData = [
+    { name: 'Provider A', qty: 425 * 50, revenue: 32400, qtyActual: 425 },
+    { name: 'Provider B', qty: 389 * 50, revenue: 28900, qtyActual: 389 },
+    { name: 'Provider C', qty: 312 * 50, revenue: 21500, qtyActual: 312 },
+    { name: 'Provider D', qty: 278 * 50, revenue: 18700, qtyActual: 278 },
+    { name: 'Provider E', qty: 234 * 50, revenue: 15200, qtyActual: 234 },
+    { name: 'Provider F', qty: 198 * 50, revenue: 13800, qtyActual: 198 },
+    { name: 'Provider G', qty: 176 * 50, revenue: 12200, qtyActual: 176 },
+    { name: 'Provider H', qty: 154 * 50, revenue: 10900, qtyActual: 154 },
+    { name: 'Provider I', qty: 139 * 50, revenue: 9800, qtyActual: 139 },
+    { name: 'Provider J', qty: 125 * 50, revenue: 8600, qtyActual: 125 },
+    { name: 'Provider K', qty: 112 * 50, revenue: 7500, qtyActual: 112 },
+    { name: 'Provider L', qty: 98 * 50, revenue: 6700, qtyActual: 98 },
+    { name: 'Provider M', qty: 87 * 50, revenue: 5900, qtyActual: 87 },
+    { name: 'Provider N', qty: 74 * 50, revenue: 5100, qtyActual: 74 },
+    { name: 'Provider O', qty: 62 * 50, revenue: 4400, qtyActual: 62 },
+  ]
 
-  const hcpcsData = {
-    revenue: [
-      { name: 'HCPCS-001', value: 35600 },
-      { name: 'HCPCS-002', value: 29400 },
-      { name: 'HCPCS-003', value: 24800 },
-      { name: 'HCPCS-004', value: 18900 },
-      { name: 'HCPCS-005', value: 14200 },
-    ],
-    quantity: [
-      { name: 'HCPCS-001', value: 456 },
-      { name: 'HCPCS-002', value: 398 },
-      { name: 'HCPCS-003', value: 342 },
-      { name: 'HCPCS-004', value: 287 },
-      { name: 'HCPCS-005', value: 234 },
-    ],
-  }
+  const hcpcsData = [
+    { name: 'HCPCS-001', qty: 456 * 50, revenue: 35600, qtyActual: 456 },
+    { name: 'HCPCS-002', qty: 398 * 50, revenue: 29400, qtyActual: 398 },
+    { name: 'HCPCS-003', qty: 342 * 50, revenue: 24800, qtyActual: 342 },
+    { name: 'HCPCS-004', qty: 287 * 50, revenue: 18900, qtyActual: 287 },
+    { name: 'HCPCS-005', qty: 234 * 50, revenue: 14200, qtyActual: 234 },
+    { name: 'HCPCS-006', qty: 205 * 50, revenue: 12600, qtyActual: 205 },
+    { name: 'HCPCS-007', qty: 183 * 50, revenue: 11200, qtyActual: 183 },
+    { name: 'HCPCS-008', qty: 167 * 50, revenue: 9900, qtyActual: 167 },
+    { name: 'HCPCS-009', qty: 148 * 50, revenue: 8700, qtyActual: 148 },
+    { name: 'HCPCS-010', qty: 132 * 50, revenue: 7800, qtyActual: 132 },
+    { name: 'HCPCS-011', qty: 119 * 50, revenue: 6900, qtyActual: 119 },
+    { name: 'HCPCS-012', qty: 105 * 50, revenue: 6100, qtyActual: 105 },
+    { name: 'HCPCS-013', qty: 93 * 50, revenue: 5400, qtyActual: 93 },
+    { name: 'HCPCS-014', qty: 81 * 50, revenue: 4700, qtyActual: 81 },
+    { name: 'HCPCS-015', qty: 69 * 50, revenue: 4100, qtyActual: 69 },
+  ]
 
-  const fittersData = {
-    revenue: [
-      { name: 'Fitter A', value: 26800 },
-      { name: 'Fitter B', value: 23400 },
-      { name: 'Fitter C', value: 19900 },
-      { name: 'Fitter D', value: 17200 },
-      { name: 'Fitter E', value: 14500 },
-    ],
-    quantity: [
-      { name: 'Fitter A', value: 368 },
-      { name: 'Fitter B', value: 329 },
-      { name: 'Fitter C', value: 298 },
-      { name: 'Fitter D', value: 267 },
-      { name: 'Fitter E', value: 223 },
-    ],
-  }
+  const fittersData = [
+    { name: 'Fitter A', qty: 368 * 50, revenue: 26800, qtyActual: 368 },
+    { name: 'Fitter B', qty: 329 * 50, revenue: 23400, qtyActual: 329 },
+    { name: 'Fitter C', qty: 298 * 50, revenue: 19900, qtyActual: 298 },
+    { name: 'Fitter D', qty: 267 * 50, revenue: 17200, qtyActual: 267 },
+    { name: 'Fitter E', qty: 223 * 50, revenue: 14500, qtyActual: 223 },
+    { name: 'Fitter F', qty: 192 * 50, revenue: 12800, qtyActual: 192 },
+    { name: 'Fitter G', qty: 171 * 50, revenue: 11400, qtyActual: 171 },
+    { name: 'Fitter H', qty: 156 * 50, revenue: 10200, qtyActual: 156 },
+    { name: 'Fitter I', qty: 142 * 50, revenue: 9100, qtyActual: 142 },
+    { name: 'Fitter J', qty: 128 * 50, revenue: 8300, qtyActual: 128 },
+    { name: 'Fitter K', qty: 115 * 50, revenue: 7500, qtyActual: 115 },
+    { name: 'Fitter L', qty: 103 * 50, revenue: 6700, qtyActual: 103 },
+    { name: 'Fitter M', qty: 91 * 50, revenue: 5900, qtyActual: 91 },
+    { name: 'Fitter N', qty: 79 * 50, revenue: 5200, qtyActual: 79 },
+    { name: 'Fitter O', qty: 67 * 50, revenue: 4600, qtyActual: 67 },
+  ]
 
   const getDataForTab = () => {
     switch (activeTab) {
       case 'stockLocation':
-        return filterBy === 'revenue' ? stockLocationData.revenue : stockLocationData.quantity
+        return stockLocationData
       case 'provider':
-        return filterBy === 'revenue' ? providerData.revenue : providerData.quantity
+        return providerData
       case 'hcpcs':
-        return filterBy === 'revenue' ? hcpcsData.revenue : hcpcsData.quantity
+        return hcpcsData
       case 'fitters':
-        return filterBy === 'revenue' ? fittersData.revenue : fittersData.quantity
+        return fittersData
       default:
         return []
     }
   }
 
-  const createChartOptions = (data, filterType) => ({
-    data: data,
-    series: [
-      {
-        type: 'bar',
-        direction: 'horizontal',
-        xKey: 'name',
-        yKey: 'value',
-        fill: '#3498db',
-        cornerRadius: 4,
-        label: {
-          enabled: true,
-          formatter: ({ value }) => {
-            if (filterType === 'revenue') {
-              return '$' + value.toLocaleString()
-            }
-            return value.toLocaleString()
+  const createChartOptions = (data) => {
+    return {
+      data: data,
+      series: [
+        {
+          type: 'bar',
+          direction: 'horizontal',
+          xKey: 'name',
+          yKey: 'qty',
+          yName: 'Qty',
+          fill: '#3498db',
+          strokeWidth: 0,
+          label: {
+            enabled: true,
+            formatter: ({ datum }) => datum.qtyActual.toLocaleString(),
           },
         },
-      },
-    ],
-    axes: [
-      {
-        type: 'category',
-        position: 'left',
-      },
-      {
-        type: 'number',
+        {
+          type: 'bar',
+          direction: 'horizontal',
+          xKey: 'name',
+          yKey: 'revenue',
+          yName: 'Est Revenue',
+          fill: '#9b59b6',
+          strokeWidth: 0,
+          label: {
+            enabled: true,
+            formatter: ({ value }) => '$' + value.toLocaleString(),
+          },
+        },
+      ],
+      axes: [
+        {
+          type: 'category',
+          position: 'left',
+        },
+        {
+          type: 'number',
+          position: 'bottom',
+        },
+      ],
+      legend: {
+        enabled: true,
         position: 'bottom',
-        title: {
-          text: filterType === 'revenue' ? 'Est. Revenue (in dollars)' : 'Qty Total (in numbers)',
-          fontWeight: 'bold',
-        },
-        label: {
-          formatter: ({ value }) => {
-            if (filterType === 'revenue') {
-              return '$' + (value / 1000).toFixed(0) + 'K'
-            }
-            return value.toString()
-          },
-        },
       },
-    ],
-  })
+    }
+  }
 
-  const chartOptions = createChartOptions(getDataForTab(), filterBy)
+  const chartOptions = createChartOptions(getDataForTab())
 
   // PDF Mode: Render all charts as separate sections
   if (isPdfMode) {
     return (
       <>
         <div className="horizontal-chart-section pdf-mode stock-location-section">
-          <h3 className="pdf-chart-title">Stock Location - Est. Revenue (in dollars)</h3>
+          <h3 className="pdf-chart-title">Stock Location - Qty & Est Revenue</h3>
           <div className="chart-wrapper">
-            <AgChartsReact options={createChartOptions(stockLocationData.revenue, 'revenue')} />
+            <AgChartsReact options={createChartOptions(stockLocationData)} />
           </div>
         </div>
 
         <div className="horizontal-chart-section pdf-mode provider-section">
-          <h3 className="pdf-chart-title">Provider - Est. Revenue (in dollars)</h3>
+          <h3 className="pdf-chart-title">Provider - Qty & Est Revenue</h3>
           <div className="chart-wrapper">
-            <AgChartsReact options={createChartOptions(providerData.revenue, 'revenue')} />
+            <AgChartsReact options={createChartOptions(providerData)} />
           </div>
         </div>
 
         <div className="horizontal-chart-section pdf-mode hcpcs-section">
-          <h3 className="pdf-chart-title">HCPCS - Est. Revenue (in dollars)</h3>
+          <h3 className="pdf-chart-title">HCPCS - Qty & Est Revenue</h3>
           <div className="chart-wrapper">
-            <AgChartsReact options={createChartOptions(hcpcsData.revenue, 'revenue')} />
+            <AgChartsReact options={createChartOptions(hcpcsData)} />
           </div>
         </div>
 
         <div className="horizontal-chart-section pdf-mode fitters-section">
-          <h3 className="pdf-chart-title">Fitters - Est. Revenue (in dollars)</h3>
+          <h3 className="pdf-chart-title">Fitters - Qty & Est Revenue</h3>
           <div className="chart-wrapper">
-            <AgChartsReact options={createChartOptions(fittersData.revenue, 'revenue')} />
+            <AgChartsReact options={createChartOptions(fittersData)} />
           </div>
         </div>
       </>
@@ -238,28 +224,6 @@ const HorizontalChartSection = () => {
           >
             Fitters
           </button>
-        </div>
-      </div>
-
-      <div className="chart-controls">
-        {activeTab === 'stockLocation' && (
-          <div className="control-item">
-            <label>Stock Location:</label>
-            <select
-              value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
-            >
-              <option value="All">All</option>
-            </select>
-          </div>
-        )}
-
-        <div className="control-item">
-          <label>Filter By:</label>
-          <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
-            <option value="revenue">Est. Revenue (in dollars)</option>
-            <option value="quantity">Qty Total (in numbers)</option>
-          </select>
         </div>
       </div>
 
