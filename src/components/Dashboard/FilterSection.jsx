@@ -114,7 +114,7 @@ const FilterSection = ({ onFiltersChange }) => {
   // Helper function to determine if filter should be full width
   const shouldBeFullWidth = (filterValue) => {
     if (Array.isArray(filterValue)) {
-      return filterValue.length > 30
+      return filterValue.length > 45
     }
     return false
   }
@@ -300,7 +300,7 @@ const FilterSection = ({ onFiltersChange }) => {
       
       setFilters({ ...filters, [field]: value, fromDate, toDate })
     } else {
-      setFilters({ ...filters, [field]: value })
+    setFilters({ ...filters, [field]: value })
     }
   }
 
@@ -332,18 +332,34 @@ const FilterSection = ({ onFiltersChange }) => {
     return (
       <div className="filter-section pdf-filter-summary">
         <h3 className="pdf-summary-title">Applied Filters</h3>
-        <div className="pdf-summary-grid">
-          {/* 6-column filters (top) - filters with ≤30 items */}
-          <div className="pdf-summary-item">
+        
+        {/* First Row: From Date, To Date, Visit Status, Bil Type */}
+        <div className="pdf-summary-first-row">
+          <div className="pdf-summary-item pdf-summary-10">
             <span className="pdf-summary-label">From Date:</span>
             <span className="pdf-summary-value">{filters.fromDate || 'Not Set'}</span>
           </div>
 
-          <div className="pdf-summary-item">
+          <div className="pdf-summary-item pdf-summary-10">
             <span className="pdf-summary-label">To Date:</span>
             <span className="pdf-summary-value">{filters.toDate || 'Not Set'}</span>
           </div>
 
+          <div className="pdf-summary-item pdf-summary-30">
+            <span className="pdf-summary-label">Visit Status:</span>
+            <span className="pdf-summary-value">{getFilterDisplayValue('visitStatus', filters.visitStatus)}</span>
+          </div>
+
+          <div className="pdf-summary-item pdf-summary-50">
+            <span className="pdf-summary-label">Bil Type:</span>
+            <span className="pdf-summary-value">{getFilterDisplayValue('bilType', filters.bilType)}</span>
+          </div>
+        </div>
+
+        {/* Remaining filters in 2-column grid */}
+        <div className="pdf-summary-grid">
+          {/* 6-column filters (top) - filters with ≤45 items */}
+          {/* 1. Stock Location */}
           {!shouldBeFullWidth(filters.stockLocation) && (
             <div className="pdf-summary-item">
               <span className="pdf-summary-label">Stock Location:</span>
@@ -351,6 +367,7 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
+          {/* 2. Provider */}
           {!shouldBeFullWidth(filters.provider) && (
             <div className="pdf-summary-item">
               <span className="pdf-summary-label">Provider:</span>
@@ -358,13 +375,7 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
-          {!shouldBeFullWidth(filters.hcpcs) && (
-            <div className="pdf-summary-item">
-              <span className="pdf-summary-label">HCPCS:</span>
-              <span className="pdf-summary-value">{getFilterDisplayValue('hcpcs', filters.hcpcs)}</span>
-            </div>
-          )}
-
+          {/* 3. Fitter */}
           {!shouldBeFullWidth(filters.fitter) && (
             <div className="pdf-summary-item">
               <span className="pdf-summary-label">Fitter:</span>
@@ -372,20 +383,7 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
-          {!shouldBeFullWidth(filters.visitStatus) && (
-            <div className="pdf-summary-item">
-              <span className="pdf-summary-label">Visit Status:</span>
-              <span className="pdf-summary-value">{getFilterDisplayValue('visitStatus', filters.visitStatus)}</span>
-            </div>
-          )}
-
-          {!shouldBeFullWidth(filters.bilType) && (
-            <div className="pdf-summary-item">
-              <span className="pdf-summary-label">Bil Type:</span>
-              <span className="pdf-summary-value">{getFilterDisplayValue('bilType', filters.bilType)}</span>
-            </div>
-          )}
-
+          {/* 4. Item Category */}
           {!shouldBeFullWidth(filters.itemCategory) && (
             <div className="pdf-summary-item">
               <span className="pdf-summary-label">Item Category:</span>
@@ -393,6 +391,15 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
+          {/* 5. HCPCS */}
+          {!shouldBeFullWidth(filters.hcpcs) && (
+            <div className="pdf-summary-item">
+              <span className="pdf-summary-label">HCPCS:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('hcpcs', filters.hcpcs)}</span>
+            </div>
+          )}
+
+          {/* 6. Item Number */}
           {!shouldBeFullWidth(filters.itemNumber) && (
             <div className="pdf-summary-item">
               <span className="pdf-summary-label">Item Number:</span>
@@ -400,7 +407,8 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
-          {/* 12-column filters (bottom) - filters with >30 items */}
+          {/* 12-column filters (bottom) - filters with >45 items - same order */}
+          {/* 1. Stock Location */}
           {shouldBeFullWidth(filters.stockLocation) && (
             <div className="pdf-summary-item pdf-summary-item-full">
               <span className="pdf-summary-label">Stock Location:</span>
@@ -408,6 +416,7 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
+          {/* 2. Provider */}
           {shouldBeFullWidth(filters.provider) && (
             <div className="pdf-summary-item pdf-summary-item-full">
               <span className="pdf-summary-label">Provider:</span>
@@ -415,13 +424,7 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
-          {shouldBeFullWidth(filters.hcpcs) && (
-            <div className="pdf-summary-item pdf-summary-item-full">
-              <span className="pdf-summary-label">HCPCS:</span>
-              <span className="pdf-summary-value">{getFilterDisplayValue('hcpcs', filters.hcpcs)}</span>
-            </div>
-          )}
-
+          {/* 3. Fitter */}
           {shouldBeFullWidth(filters.fitter) && (
             <div className="pdf-summary-item pdf-summary-item-full">
               <span className="pdf-summary-label">Fitter:</span>
@@ -429,20 +432,7 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
-          {shouldBeFullWidth(filters.visitStatus) && (
-            <div className="pdf-summary-item pdf-summary-item-full">
-              <span className="pdf-summary-label">Visit Status:</span>
-              <span className="pdf-summary-value">{getFilterDisplayValue('visitStatus', filters.visitStatus)}</span>
-            </div>
-          )}
-
-          {shouldBeFullWidth(filters.bilType) && (
-            <div className="pdf-summary-item pdf-summary-item-full">
-              <span className="pdf-summary-label">Bil Type:</span>
-              <span className="pdf-summary-value">{getFilterDisplayValue('bilType', filters.bilType)}</span>
-            </div>
-          )}
-
+          {/* 4. Item Category */}
           {shouldBeFullWidth(filters.itemCategory) && (
             <div className="pdf-summary-item pdf-summary-item-full">
               <span className="pdf-summary-label">Item Category:</span>
@@ -450,6 +440,15 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           )}
 
+          {/* 5. HCPCS */}
+          {shouldBeFullWidth(filters.hcpcs) && (
+            <div className="pdf-summary-item pdf-summary-item-full">
+              <span className="pdf-summary-label">HCPCS:</span>
+              <span className="pdf-summary-value">{getFilterDisplayValue('hcpcs', filters.hcpcs)}</span>
+            </div>
+          )}
+
+          {/* 6. Item Number */}
           {shouldBeFullWidth(filters.itemNumber) && (
             <div className="pdf-summary-item pdf-summary-item-full">
               <span className="pdf-summary-label">Item Number:</span>
@@ -467,35 +466,35 @@ const FilterSection = ({ onFiltersChange }) => {
       <div className="filter-grid">
         <div className="filter-column">
           <div className="date-filter-box">
-            <div className="filter-item">
-              <label>Date of Service</label>
+        <div className="filter-item">
+          <label>Date of Service</label>
               <select
-                value={filters.dateOfService}
-                onChange={(e) => handleFilterChange('dateOfService', e.target.value)}
+            value={filters.dateOfService}
+            onChange={(e) => handleFilterChange('dateOfService', e.target.value)}
               >
                 {filterOptions.dateOfService.map(option => (
                   <option key={option} value={option}>{option}</option>
                 ))}
-              </select>
-            </div>
+          </select>
+        </div>
 
             <div className="date-range-row">
-              <div className="filter-item">
-                <label>From Date</label>
-                <input
-                  type="date"
-                  value={filters.fromDate}
-                  onChange={(e) => handleFilterChange('fromDate', e.target.value)}
-                />
-              </div>
+        <div className="filter-item">
+          <label>From Date</label>
+          <input
+            type="date"
+            value={filters.fromDate}
+            onChange={(e) => handleFilterChange('fromDate', e.target.value)}
+          />
+        </div>
 
-              <div className="filter-item">
-                <label>To Date</label>
-                <input
-                  type="date"
-                  value={filters.toDate}
-                  onChange={(e) => handleFilterChange('toDate', e.target.value)}
-                />
+        <div className="filter-item">
+          <label>To Date</label>
+          <input
+            type="date"
+            value={filters.toDate}
+            onChange={(e) => handleFilterChange('toDate', e.target.value)}
+          />
               </div>
             </div>
           </div>
@@ -536,10 +535,10 @@ const FilterSection = ({ onFiltersChange }) => {
                 </div>
               )}
             </div>
-          </div>
+        </div>
 
-          <div className="filter-item">
-            <label>Item Category Name</label>
+        <div className="filter-item">
+          <label>Item Category Name</label>
             <div className="multi-select-wrapper">
               <div 
                 className="multi-select-display"
@@ -582,7 +581,7 @@ const FilterSection = ({ onFiltersChange }) => {
               <div 
                 className="multi-select-display"
                 onClick={() => setOpenDropdown(openDropdown === 'provider' ? null : 'provider')}
-              >
+          >
                 {getDisplayText('provider')}
                 <span className="dropdown-arrow">▼</span>
               </div>
@@ -610,10 +609,10 @@ const FilterSection = ({ onFiltersChange }) => {
                 </div>
               )}
             </div>
-          </div>
+        </div>
 
-          <div className="filter-item">
-            <label>Bil Type</label>
+        <div className="filter-item">
+          <label>Bil Type</label>
             <div className="multi-select-wrapper">
               <div 
                 className="multi-select-display"
@@ -684,10 +683,10 @@ const FilterSection = ({ onFiltersChange }) => {
                 </div>
               )}
             </div>
-          </div>
+        </div>
 
-          <div className="filter-item">
-            <label>Item Number</label>
+        <div className="filter-item">
+          <label>Item Number</label>
             <div className="multi-select-wrapper">
               <div 
                 className="multi-select-display"
@@ -730,7 +729,7 @@ const FilterSection = ({ onFiltersChange }) => {
               <div 
                 className="multi-select-display"
                 onClick={() => setOpenDropdown(openDropdown === 'fitter' ? null : 'fitter')}
-              >
+          >
                 {getDisplayText('fitter')}
                 <span className="dropdown-arrow">▼</span>
               </div>
@@ -757,12 +756,12 @@ const FilterSection = ({ onFiltersChange }) => {
                   ))}
                 </div>
               )}
-            </div>
-          </div>
+        </div>
+      </div>
 
-          <button className="reset-btn" onClick={handleReset}>
-            Reset to Default
-          </button>
+        <button className="reset-btn" onClick={handleReset}>
+          Reset to Default
+        </button>
         </div>
 
         <div className="filter-column">
@@ -802,9 +801,9 @@ const FilterSection = ({ onFiltersChange }) => {
             </div>
           </div>
 
-          <button className="apply-btn" onClick={handleApply}>
-            Apply
-          </button>
+        <button className="apply-btn" onClick={handleApply}>
+          Apply
+        </button>
         </div>
       </div>
     </div>

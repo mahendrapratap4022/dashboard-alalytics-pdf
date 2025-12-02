@@ -113,17 +113,17 @@ const HorizontalChartSection = () => {
   const createChartOptions = (data) => {
     return {
       data: data,
-      series: [
-        {
-          type: 'bar',
-          direction: 'horizontal',
-          xKey: 'name',
+    series: [
+      {
+        type: 'bar',
+        direction: 'horizontal',
+        xKey: 'name',
           yKey: 'qty',
           yName: 'Qty',
-          fill: '#3498db',
+        fill: '#3498db',
           strokeWidth: 0,
-          label: {
-            enabled: true,
+        label: {
+          enabled: true,
             formatter: ({ datum }) => datum.qtyActual.toLocaleString(),
           },
         },
@@ -138,17 +138,17 @@ const HorizontalChartSection = () => {
           label: {
             enabled: true,
             formatter: ({ value }) => '$' + value.toLocaleString(),
-          },
         },
-      ],
-      axes: [
-        {
-          type: 'category',
-          position: 'left',
-        },
-        {
-          type: 'number',
-          position: 'bottom',
+      },
+    ],
+    axes: [
+      {
+        type: 'category',
+        position: 'left',
+      },
+      {
+        type: 'number',
+        position: 'bottom',
         },
       ],
       legend: {

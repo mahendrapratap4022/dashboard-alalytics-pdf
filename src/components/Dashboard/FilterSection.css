@@ -29,6 +29,28 @@ body.generating-pdf .pdf-filter-summary {
   border-bottom: 2px solid #3498db;
 }
 
+.pdf-summary-first-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.pdf-summary-10 {
+  flex: 0 0 10%;
+  max-width: 10%;
+}
+
+.pdf-summary-30 {
+  flex: 0 0 30%;
+  max-width: 30%;
+}
+
+.pdf-summary-50 {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
 .pdf-summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

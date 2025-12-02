@@ -10,7 +10,7 @@ import './Dashboard.css'
 const Dashboard = () => {
   const [lastUpdated] = useState(new Date().toLocaleString())
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-  const [loggedUser] = useState('Tenant User') // Replace with actual logged user
+  const [loggedUser] = useState('{tenant name}') // Replace with actual logged user
   const [filters, setFilters] = useState({})
   const printableRef = useRef(null)
 
@@ -230,11 +230,11 @@ const Dashboard = () => {
           }
         } else {
           // Add section image to PDF at normal size
-          const sectionImgData = sectionCanvas.toDataURL('image/png', 1.0)
-          pdf.addImage(sectionImgData, 'PNG', margin, currentY, sectionImgWidth, sectionImgHeight, undefined, 'FAST')
-          
-          // Update position for next section
-          currentY += sectionImgHeight + 5 // 5mm gap between sections
+        const sectionImgData = sectionCanvas.toDataURL('image/png', 1.0)
+        pdf.addImage(sectionImgData, 'PNG', margin, currentY, sectionImgWidth, sectionImgHeight, undefined, 'FAST')
+        
+        // Update position for next section
+        currentY += sectionImgHeight + 5 // 5mm gap between sections
         }
         
         isFirstSection = false
