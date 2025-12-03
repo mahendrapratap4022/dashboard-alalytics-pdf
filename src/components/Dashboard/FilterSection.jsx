@@ -63,6 +63,7 @@ const FilterSection = ({ onFiltersChange }) => {
     itemCategory: [...filterOptions.itemCategory],
     bilType: [...filterOptions.bilType],
     itemNumber: [...filterOptions.itemNumber],
+    chartSort: 'Estimated revenue (dollar)',
   })
 
   const [openDropdown, setOpenDropdown] = useState(null)
@@ -318,6 +319,7 @@ const FilterSection = ({ onFiltersChange }) => {
       itemCategory: [...filterOptions.itemCategory],
       bilType: [...filterOptions.bilType],
       itemNumber: [...filterOptions.itemNumber],
+      chartSort: 'Estimated revenue (dollar)',
     })
     setOpenDropdown(null)
   }
@@ -455,6 +457,14 @@ const FilterSection = ({ onFiltersChange }) => {
               <span className="pdf-summary-value">{getFilterDisplayValue('itemNumber', filters.itemNumber)}</span>
             </div>
           )}
+        </div>
+        
+        {/* Chart Sort */}
+        <div className="pdf-chart-sort">
+          <div className="pdf-summary-item">
+            <span className="pdf-summary-label">Chart sort based on (top 30):</span>
+            <span className="pdf-summary-value">{filters.chartSort || 'Not Set'}</span>
+          </div>
         </div>
       </div>
     )
@@ -804,6 +814,20 @@ const FilterSection = ({ onFiltersChange }) => {
         <button className="apply-btn" onClick={handleApply}>
           Apply
         </button>
+        </div>
+      </div>
+      
+      {/* Chart Sort Dropdown - Separate from filters but close */}
+      <div className="chart-sort-section">
+        <div className="filter-item">
+          <label>Chart sort based on (top 30)</label>
+          <select
+            value={filters.chartSort}
+            onChange={(e) => handleFilterChange('chartSort', e.target.value)}
+          >
+            <option value="Estimated revenue (dollar)">Estimated revenue (dollar)</option>
+            <option value="Qty">Qty</option>
+          </select>
         </div>
       </div>
     </div>

@@ -230,6 +230,32 @@ body.generating-pdf .printable-content {
   padding: 30px !important;
 }
 
+/* Component ordering for web view */
+.pdf-first-page {
+  order: 0;
+}
+
+.filter-section:not(.pdf-filter-summary) {
+  order: 1; /* Filters at top in web view */
+}
+
+.data-cards-section {
+  order: 2;
+}
+
+.line-chart-section {
+  order: 3;
+}
+
+.horizontal-chart-section {
+  order: 4;
+}
+
+/* Reorder FilterSection to end in PDF mode */
+body.generating-pdf .pdf-filter-summary {
+  order: 999 !important; /* Move PDF filter summary to end */
+}
+
 body.generating-pdf .chart-container {
   width: 1300px !important;
   min-width: 1300px !important;

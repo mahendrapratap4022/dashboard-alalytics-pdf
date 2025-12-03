@@ -336,3 +336,25 @@ body.generating-pdf .filter-grid {
   grid-template-columns: repeat(6, 1fr) !important;
 }
 
+/* Chart Sort Section */
+.chart-sort-section {
+  margin-top: 15px;
+  padding: 15px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background: #f8f9fa;
+  width: fit-content;
+  min-width: 300px;
+}
+
+.chart-sort-section .filter-item {
+  margin-bottom: 0;
+}
+
+/* PDF Chart Sort */
+.pdf-chart-sort {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #d1d5db;
+}
+

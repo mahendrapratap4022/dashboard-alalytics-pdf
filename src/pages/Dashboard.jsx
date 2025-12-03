@@ -363,11 +363,11 @@ const Dashboard = () => {
           </div>
         </div>
         
+        <FilterSection onFiltersChange={setFilters} />
+        
         <DataCards toDate={filters.toDate} />
         <LineChartSection />
         <HorizontalChartSection />
-        
-        <FilterSection onFiltersChange={setFilters} />
       </div>
     </div>
   )
