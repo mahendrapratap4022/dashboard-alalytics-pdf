@@ -266,8 +266,7 @@ body.generating-pdf .chart-container {
 body.generating-pdf .chart-wrapper {
   width: 1300px !important;
   min-width: 1300px !important;
-  height: 500px !important;
-  min-height: 500px !important;
+  /* Height is set dynamically via inline styles based on item count */
 }
 
 body.generating-pdf .cards-container {

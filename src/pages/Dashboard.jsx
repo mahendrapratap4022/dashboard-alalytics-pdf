@@ -78,20 +78,21 @@ const Dashboard = () => {
         })
       })
       
-      // Horizontal charts (.chart-wrapper) - 1000px to match web
+      // Horizontal charts (.chart-wrapper) - preserve dynamic heights set by component
       const horizontalChartWrappers = element.querySelectorAll('.chart-wrapper')
       horizontalChartWrappers.forEach((container) => {
         container.style.width = '1340px'
         container.style.minWidth = '1340px'
         container.style.maxWidth = '1340px'
-        container.style.height = '1000px'
-        container.style.minHeight = '1000px'
+        // Height is set dynamically by component based on item count, don't override
+        // container.style.height and minHeight are already set by inline styles
         
-        // Also force the inner divs that hold AG Charts
+        // Also force the inner divs that hold AG Charts to match container height
+        const containerHeight = container.style.height || container.offsetHeight
         const agChartWrappers = container.querySelectorAll('div')
         agChartWrappers.forEach((div) => {
           div.style.width = '1340px'
-          div.style.height = '1000px'
+          div.style.height = containerHeight + 'px'
         })
       })
       

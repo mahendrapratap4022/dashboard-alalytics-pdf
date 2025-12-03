@@ -110,16 +110,6 @@ const HorizontalChartSection = () => {
     { name: 'HCPCS-018', qty: 445 * 50, revenue: 39500, qtyActual: 445 },
     { name: 'HCPCS-019', qty: 89 * 50, revenue: 11400, qtyActual: 89 },
     { name: 'HCPCS-020', qty: 356 * 50, revenue: 32100, qtyActual: 356 },
-    { name: 'HCPCS-021', qty: 212 * 50, revenue: 23900, qtyActual: 212 },
-    { name: 'HCPCS-022', qty: 567 * 50, revenue: 48600, qtyActual: 567 },
-    { name: 'HCPCS-023', qty: 134 * 50, revenue: 16500, qtyActual: 134 },
-    { name: 'HCPCS-024', qty: 401 * 50, revenue: 36800, qtyActual: 401 },
-    { name: 'HCPCS-025', qty: 78 * 50, revenue: 10200, qtyActual: 78 },
-    { name: 'HCPCS-026', qty: 289 * 50, revenue: 28400, qtyActual: 289 },
-    { name: 'HCPCS-027', qty: 167 * 50, revenue: 19100, qtyActual: 167 },
-    { name: 'HCPCS-028', qty: 478 * 50, revenue: 42300, qtyActual: 478 },
-    { name: 'HCPCS-029', qty: 123 * 50, revenue: 15200, qtyActual: 123 },
-    { name: 'HCPCS-030', qty: 245 * 50, revenue: 25600, qtyActual: 245 },
   ]
 
   const fittersData = [
@@ -143,16 +133,6 @@ const HorizontalChartSection = () => {
     { name: 'Fitter R', qty: 223 * 50, revenue: 17600, qtyActual: 223 },
     { name: 'Fitter S', qty: 145 * 50, revenue: 11200, qtyActual: 145 },
     { name: 'Fitter T', qty: 178 * 50, revenue: 13800, qtyActual: 178 },
-    { name: 'Fitter U', qty: 112 * 50, revenue: 8600, qtyActual: 112 },
-    { name: 'Fitter V', qty: 234 * 50, revenue: 18100, qtyActual: 234 },
-    { name: 'Fitter W', qty: 89 * 50, revenue: 6800, qtyActual: 89 },
-    { name: 'Fitter X', qty: 156 * 50, revenue: 12100, qtyActual: 156 },
-    { name: 'Fitter Y', qty: 201 * 50, revenue: 15800, qtyActual: 201 },
-    { name: 'Fitter Z', qty: 67 * 50, revenue: 5200, qtyActual: 67 },
-    { name: 'Fitter AA', qty: 134 * 50, revenue: 10400, qtyActual: 134 },
-    { name: 'Fitter AB', qty: 189 * 50, revenue: 14600, qtyActual: 189 },
-    { name: 'Fitter AC', qty: 78 * 50, revenue: 6100, qtyActual: 78 },
-    { name: 'Fitter AD', qty: 145 * 50, revenue: 11500, qtyActual: 145 },
   ]
 
   const getDataForTab = () => {
@@ -220,34 +200,43 @@ const HorizontalChartSection = () => {
 
   const chartOptions = createChartOptions(getDataForTab())
 
+  // Calculate dynamic height based on number of items
+  // Base: ~33px per item (1000px for 30 items)
+  const calculateChartHeight = (itemCount) => {
+    const baseHeightPerItem = 33.33 // pixels per item
+    const minHeight = 400 // minimum height
+    const calculatedHeight = itemCount * baseHeightPerItem
+    return Math.max(calculatedHeight, minHeight)
+  }
+
   // PDF Mode: Render all charts as separate sections
   if (isPdfMode) {
     return (
       <>
         <div className="horizontal-chart-section pdf-mode stock-location-section">
           <h3 className="pdf-chart-title">Stock Location - Qty & Est Revenue</h3>
-          <div className="chart-wrapper">
+          <div className="chart-wrapper" style={{ height: `${calculateChartHeight(stockLocationData.length)}px`, minHeight: `${calculateChartHeight(stockLocationData.length)}px` }}>
             <AgChartsReact options={createChartOptions(stockLocationData)} />
           </div>
         </div>
 
         <div className="horizontal-chart-section pdf-mode provider-section">
           <h3 className="pdf-chart-title">Provider - Qty & Est Revenue</h3>
-          <div className="chart-wrapper">
+          <div className="chart-wrapper" style={{ height: `${calculateChartHeight(providerData.length)}px`, minHeight: `${calculateChartHeight(providerData.length)}px` }}>
             <AgChartsReact options={createChartOptions(providerData)} />
           </div>
         </div>
 
         <div className="horizontal-chart-section pdf-mode hcpcs-section">
           <h3 className="pdf-chart-title">HCPCS - Qty & Est Revenue</h3>
-          <div className="chart-wrapper">
+          <div className="chart-wrapper" style={{ height: `${calculateChartHeight(hcpcsData.length)}px`, minHeight: `${calculateChartHeight(hcpcsData.length)}px` }}>
             <AgChartsReact options={createChartOptions(hcpcsData)} />
           </div>
         </div>
 
         <div className="horizontal-chart-section pdf-mode fitters-section">
           <h3 className="pdf-chart-title">Fitters - Qty & Est Revenue</h3>
-          <div className="chart-wrapper">
+          <div className="chart-wrapper" style={{ height: `${calculateChartHeight(fittersData.length)}px`, minHeight: `${calculateChartHeight(fittersData.length)}px` }}>
             <AgChartsReact options={createChartOptions(fittersData)} />
           </div>
         </div>
@@ -287,7 +276,7 @@ const HorizontalChartSection = () => {
         </div>
       </div>
 
-      <div className="chart-wrapper">
+      <div className="chart-wrapper" style={{ height: `${calculateChartHeight(getDataForTab().length)}px`, minHeight: `${calculateChartHeight(getDataForTab().length)}px` }}>
         <AgChartsReact options={chartOptions} />
       </div>
     </div>
