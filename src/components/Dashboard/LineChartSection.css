@@ -17,8 +17,8 @@
 body.generating-pdf .chart-container {
   width: 1300px !important;
   min-width: 1300px !important;
-  height: 500px !important;
-  min-height: 500px !important;
+  height: 400px !important;
+  min-height: 400px !important;
 }
 
 body.generating-pdf .line-chart-section {

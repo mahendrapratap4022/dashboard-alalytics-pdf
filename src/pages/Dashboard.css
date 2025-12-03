@@ -169,58 +169,57 @@ body.generating-pdf .pdf-first-page {
 /* PDF Header */
 .pdf-header {
   display: none;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 10px 0;
-  border-bottom: 3px solid #3498db;
-  margin-bottom: 0;
+  flex-direction: column;
+  padding: 10px 0 15px 0;
+  border-bottom: 3px solid #3498db !important;
+  margin-bottom: 15px;
 }
 
 body.generating-pdf .pdf-header {
   display: flex !important;
   width: 100% !important;
   max-width: 100% !important;
+  border-bottom: 3px solid #3498db !important;
 }
 
-.pdf-header-left h2 {
-  margin: 0 0 5px 0;
+.pdf-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.pdf-header h2 {
+  margin: 0;
   font-size: 28px;
   color: #2c3e50;
   font-weight: 700;
 }
 
-.pdf-date {
+.pdf-header-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  white-space: nowrap;
+}
+
+.pdf-generated {
   margin: 0;
   font-size: 14px;
   color: #7f8c8d;
 }
 
-.pdf-header-right {
-  text-align: right;
-}
-
-.pdf-user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  background: #f8f9fa;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border-left: 4px solid #3498db;
-}
-
-.pdf-user-label {
-  font-size: 12px;
-  color: #7f8c8d;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.pdf-user-name {
-  font-size: 16px;
+.pdf-tenant-info {
+  font-size: 14px;
   color: #2c3e50;
-  font-weight: 600;
+  font-weight: 500;
+}
+
+.pdf-date-range {
+  font-size: 14px;
+  color: #2c3e50;
+  font-weight: 500;
 }
 
 /* PDF Generation Mode - Force Desktop Layout */

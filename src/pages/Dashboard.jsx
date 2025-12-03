@@ -10,7 +10,7 @@ import './Dashboard.css'
 const Dashboard = () => {
   const [lastUpdated] = useState(new Date().toLocaleString())
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-  const [loggedUser] = useState('{tenant name}') // Replace with actual logged user
+  const [loggedUser] = useState('Tenant Name') // Replace with actual logged user
   const [filters, setFilters] = useState({})
   const printableRef = useRef(null)
 
@@ -60,19 +60,38 @@ const Dashboard = () => {
         section.style.maxWidth = '1340px'
       })
       
-      const chartContainers = element.querySelectorAll('.chart-container, .chart-wrapper')
-      chartContainers.forEach((container) => {
+      // Set heights for different chart types to match web view
+      // Line charts (.chart-container) - 400px to match web
+      const lineChartContainers = element.querySelectorAll('.line-chart-section .chart-container, .chart-section .chart-container')
+      lineChartContainers.forEach((container) => {
         container.style.width = '1340px'
         container.style.minWidth = '1340px'
         container.style.maxWidth = '1340px'
-        container.style.height = '500px'
-        container.style.minHeight = '500px'
+        container.style.height = '400px'
+        container.style.minHeight = '400px'
         
         // Also force the inner divs that hold AG Charts
         const agChartWrappers = container.querySelectorAll('div')
         agChartWrappers.forEach((div) => {
           div.style.width = '1340px'
-          div.style.height = '500px'
+          div.style.height = '400px'
+        })
+      })
+      
+      // Horizontal charts (.chart-wrapper) - 1000px to match web
+      const horizontalChartWrappers = element.querySelectorAll('.chart-wrapper')
+      horizontalChartWrappers.forEach((container) => {
+        container.style.width = '1340px'
+        container.style.minWidth = '1340px'
+        container.style.maxWidth = '1340px'
+        container.style.height = '1000px'
+        container.style.minHeight = '1000px'
+        
+        // Also force the inner divs that hold AG Charts
+        const agChartWrappers = container.querySelectorAll('div')
+        agChartWrappers.forEach((div) => {
+          div.style.width = '1340px'
+          div.style.height = '1000px'
         })
       })
       
@@ -96,6 +115,9 @@ const Dashboard = () => {
       // Wait longer for charts to re-render at desktop size and PDF header to show
       await new Promise(resolve => setTimeout(resolve, 3000))
       
+      // Wait for filter section to render in PDF mode
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
       // A4 Landscape dimensions (in mm)
       const pdfWidth = 297
       const pdfHeight = 210
@@ -111,6 +133,9 @@ const Dashboard = () => {
       })
 
       // Get all major sections
+      const filterSectionElement = element.querySelector('.pdf-filter-summary')
+      console.log('Filter section element found:', filterSectionElement)
+      
       const sections = [
         { element: element.querySelector('.pdf-first-page'), name: 'First Page' },
         { element: element.querySelector('.data-cards-section'), name: 'Data Cards' },
@@ -118,14 +143,20 @@ const Dashboard = () => {
         { element: element.querySelector('.stock-location-section'), name: 'Stock Location Chart' },
         { element: element.querySelector('.provider-section'), name: 'Provider Chart' },
         { element: element.querySelector('.hcpcs-section'), name: 'HCPCS Chart' },
-        { element: element.querySelector('.fitters-section'), name: 'Fitters Chart' }
+        { element: element.querySelector('.fitters-section'), name: 'Fitters Chart' },
+        { element: filterSectionElement, name: 'Applied Filters' }
       ].filter(section => section.element) // Only include sections that exist
+      
+      console.log('Total sections to capture:', sections.length)
+      sections.forEach(s => console.log(`- ${s.name}: ${s.element ? 'found' : 'missing'}`))
 
       let currentY = margin
       let isFirstSection = true
 
       // Capture and add each section separately
-      for (const section of sections) {
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i]
+        const isLastSection = i === sections.length - 1
         console.log(`Capturing section: ${section.name}`)
         
         const sectionCanvas = await html2canvas(section.element, {
@@ -161,14 +192,38 @@ const Dashboard = () => {
         const sectionImgWidth = contentWidth
         const sectionImgHeight = (sectionCanvas.height * contentWidth) / sectionCanvas.width
         
-        console.log(`${section.name} height: ${sectionImgHeight}mm`)
+        console.log(`${section.name} height: ${sectionImgHeight}mm, currentY: ${currentY}mm`)
         
         // Check if section fits on current page
-        if (!isFirstSection && (currentY + sectionImgHeight) > (pdfHeight - margin)) {
-          // Section doesn't fit, start a new page
-          pdf.addPage()
-          currentY = margin
-          console.log(`${section.name} moved to new page`)
+        // Use a smaller gap (2mm instead of 5mm) and be smarter about page breaks
+        // No gap for last section to maximize space usage
+        const sectionGap = isLastSection ? 0 : 2
+        const spaceNeeded = sectionImgHeight + sectionGap
+        
+        if (!isFirstSection) {
+          const availableSpace = (pdfHeight - margin) - currentY
+          const isSmallSection = sectionImgHeight < 50
+          
+          // For the last section (Applied Filters), be more aggressive about fitting it on current page
+          if (isLastSection) {
+            // If it's the last section and can fit (even if tight), don't add new page
+            if (availableSpace >= sectionImgHeight) {
+              console.log(`${section.name} is last section, fitting on current page (${sectionImgHeight}mm in ${availableSpace}mm available)`)
+            } else {
+              // Only add new page if it really doesn't fit
+              pdf.addPage()
+              currentY = margin
+              console.log(`${section.name} is last section but doesn't fit, moved to new page`)
+            }
+          } else if (isSmallSection && availableSpace >= sectionImgHeight) {
+            // Small section can fit, don't add new page
+            console.log(`${section.name} is small (${sectionImgHeight}mm), fitting on current page`)
+          } else if (currentY + spaceNeeded > (pdfHeight - margin - 5)) {
+            // Section doesn't fit, start a new page
+            pdf.addPage()
+            currentY = margin
+            console.log(`${section.name} moved to new page`)
+          }
         }
 
         // Check if section is too tall for even a single page
@@ -225,7 +280,7 @@ const Dashboard = () => {
               currentY = margin
               console.log(`${section.name} continued on new page, remaining: ${remainingHeight}mm`)
             } else {
-              currentY += heightToAdd + 5
+              currentY += heightToAdd + 2 // Reduced gap
             }
           }
         } else {
@@ -233,8 +288,9 @@ const Dashboard = () => {
         const sectionImgData = sectionCanvas.toDataURL('image/png', 1.0)
         pdf.addImage(sectionImgData, 'PNG', margin, currentY, sectionImgWidth, sectionImgHeight, undefined, 'FAST')
         
-        // Update position for next section
-        currentY += sectionImgHeight + 5 // 5mm gap between sections
+        // Update position for next section - no gap for last section, 2mm for others
+        const gap = isLastSection ? 0 : 2
+        currentY += sectionImgHeight + gap
         }
         
         isFirstSection = false
@@ -296,24 +352,22 @@ const Dashboard = () => {
       <div ref={printableRef} className="printable-content">
         <div className="pdf-first-page">
           <div className="pdf-header">
-            <div className="pdf-header-left">
+            <div className="pdf-header-row">
               <h2>Analytics Dashboard</h2>
-              <p className="pdf-date">Generated: {new Date().toLocaleString()}</p>
-            </div>
-            <div className="pdf-header-right">
-              <div className="pdf-user-info">
-                <span className="pdf-user-label">Generated By:</span>
-                <span className="pdf-user-name">{loggedUser}</span>
+              <div className="pdf-header-right">
+                <span className="pdf-tenant-info">{loggedUser}</span>
+                <span className="pdf-date-range">Date Range: From {filters.fromDate || 'N/A'} - To {filters.toDate || 'N/A'}</span>
               </div>
             </div>
+            <p className="pdf-generated">Generated: {new Date().toLocaleString()}</p>
           </div>
-          
-          <FilterSection onFiltersChange={setFilters} />
         </div>
         
         <DataCards toDate={filters.toDate} />
         <LineChartSection />
         <HorizontalChartSection />
+        
+        <FilterSection onFiltersChange={setFilters} />
       </div>
     </div>
   )
